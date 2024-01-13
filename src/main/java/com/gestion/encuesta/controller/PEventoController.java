@@ -3,6 +3,7 @@ package com.gestion.encuesta.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,19 +30,55 @@ public class PEventoController {
     }
     
     @GetMapping("/listar/{id}")
-    public ParticipacionEvento listarPEventoPorId(@PathVariable Long id) {
-        return pEventoService.obtenerPEventoPorId(id);
+    public ResponseEntity<?> listarPEventoPorId(@PathVariable Long id) {
+        ParticipacionEvento participacionEvento = pEventoService.obtenerPEventoPorId(id);
+        if (participacionEvento != null) {
+            return ResponseEntity.ok(participacionEvento);
+        }else {
+            return ResponseEntity.notFound().build();
+        }
     }
-    
+
     @PostMapping("/guardar")
-    public void guardarPEvento(@RequestBody ParticipacionEvento pEvento) {
+    public ResponseEntity<?> guardarPEvento(@RequestBody ParticipacionEvento pEvento) {
+        if (pEvento.getEvento() == null) {
+            return ResponseEntity.badRequest().body("El evento no puede ser nulo");
+        }
+
+        if (pEvento.getUsuario() == null) {
+            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
+        }
+
+        if (pEvento.getRol() == null || pEvento.getRol().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El rol de participación no puede estar en blanco");
+        }
+
+
         pEventoService.guardarPEvento(pEvento);
+        return ResponseEntity.ok("Participación en evento guardada exitosamente");
     }
-    
+
     @PutMapping("/editar/{id}")
-    public void editarPEvento(@PathVariable Long id, @RequestBody ParticipacionEvento pEvento) {
+    public ResponseEntity<?> editarPEvento(@PathVariable Long id, @RequestBody ParticipacionEvento pEvento) {
+        if (pEvento.getEvento() == null) {
+            return ResponseEntity.badRequest().body("El evento no puede ser nulo");
+        }
+
+        if (pEvento.getUsuario() == null) {
+            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
+        }
+
+        if (pEvento.getRol() == null || pEvento.getRol().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El rol de participación no puede estar en blanco");
+        }
+        ParticipacionEvento peventoExistente = pEventoService.obtenerPEventoPorId(id);
+        if (peventoExistente == null) {
+            return ResponseEntity.badRequest().body("La participacion a editar no existe");
+        }
+
         pEvento.setId(id);
         pEventoService.guardarPEvento(pEvento);
+        return ResponseEntity.ok("Participación en evento editada exitosamente");
     }
 
     @DeleteMapping("/eliminar/{id}")

@@ -1,6 +1,7 @@
 package com.gestion.encuesta.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class EventoService {
     public void guardarEvento(Evento evento) {
         eventoRepository.save(evento);
     }
+
 
     public void eliminarEventoPorId(Long id) {
         eventoRepository.deleteById(id);
