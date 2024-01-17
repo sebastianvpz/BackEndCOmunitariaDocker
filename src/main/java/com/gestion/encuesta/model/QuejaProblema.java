@@ -1,5 +1,7 @@
 package com.gestion.encuesta.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,6 +14,7 @@ public class QuejaProblema {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties("quejasProblemas")
     private Usuario usuario;
     private String url;
     private String descripcion;

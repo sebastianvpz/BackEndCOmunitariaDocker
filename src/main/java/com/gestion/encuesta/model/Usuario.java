@@ -3,6 +3,9 @@ package com.gestion.encuesta.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,8 +26,10 @@ public class Usuario {
     private String nombre;
     private String apellido;
     private String email;
+    private String rol;
     private String password;
     
+    @JsonIgnoreProperties("usuario")
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Collection<Propuesta> itemsPropuesta = new ArrayList<>();
 
@@ -36,7 +41,8 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Collection<ParticipacionEvento> participacionEventos = new ArrayList<>();
-
+   
+    @JsonIgnore	
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Collection<QuejaProblema> quejasProblemas = new ArrayList<>();
 
