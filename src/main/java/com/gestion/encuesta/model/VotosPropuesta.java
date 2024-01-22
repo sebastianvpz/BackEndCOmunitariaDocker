@@ -21,5 +21,6 @@ public class VotosPropuesta {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    private int voto;
+    
+    private boolean votoPositivo;
 }

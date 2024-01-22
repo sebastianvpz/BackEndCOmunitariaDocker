@@ -39,4 +39,14 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body("No se pudo guardar el usuario. Verficar campos.");
         }
     }
+    @GetMapping("/obtenerUsuarioPorId/{id}")
+    public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
+        Usuario usuario = service.obtenerUsuarioPorId(id);
+
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

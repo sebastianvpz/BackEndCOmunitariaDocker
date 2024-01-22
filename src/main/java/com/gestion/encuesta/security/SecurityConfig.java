@@ -33,4 +33,5 @@ public class SecurityConfig {
 					.requestMatchers(HttpMethod.DELETE).permitAll());
 				
 	}
+    
 }

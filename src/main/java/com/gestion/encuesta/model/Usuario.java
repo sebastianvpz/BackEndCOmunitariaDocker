@@ -29,6 +29,7 @@ public class Usuario {
     private String email;
     private String rol;
     private String password;
+    private boolean votado;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonIgnore
