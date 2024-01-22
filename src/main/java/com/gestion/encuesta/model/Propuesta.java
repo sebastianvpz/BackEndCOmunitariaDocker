@@ -1,5 +1,6 @@
 package com.gestion.encuesta.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
@@ -19,7 +20,6 @@ public class Propuesta {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    @JsonIgnoreProperties("itemsPropuesta")
     private Usuario usuario;
     private String url;
     private String titulo;

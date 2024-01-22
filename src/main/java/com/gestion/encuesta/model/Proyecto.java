@@ -1,5 +1,10 @@
 package com.gestion.encuesta.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,4 +18,5 @@ public class Proyecto {
     private String titulo;
     private String descripcion;
     private String estado;
-}
+    
+}	

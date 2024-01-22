@@ -50,7 +50,7 @@ public class PEventoController {
         }
 
         if (pEvento.getRol() == null || pEvento.getRol().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El rol de participación no puede estar en blanco");
+            pEvento.setRol("Asistente");
         }
 
 
@@ -68,14 +68,15 @@ public class PEventoController {
             return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
         }
 
+     // Establecer el rol por defecto como 'Asistente' si no se proporciona uno
         if (pEvento.getRol() == null || pEvento.getRol().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El rol de participación no puede estar en blanco");
+            pEvento.setRol("Asistente");
         }
         ParticipacionEvento peventoExistente = pEventoService.obtenerPEventoPorId(id);
         if (peventoExistente == null) {
             return ResponseEntity.badRequest().body("La participacion a editar no existe");
         }
-
+        
         pEvento.setId(id);
         pEventoService.guardarPEvento(pEvento);
         return ResponseEntity.ok("Participación en evento editada exitosamente");

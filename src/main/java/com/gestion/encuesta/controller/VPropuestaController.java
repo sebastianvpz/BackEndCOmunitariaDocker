@@ -49,9 +49,6 @@ public class VPropuestaController {
             return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
         }
 
-        if (vPropuesta.getVoto() < 1 || vPropuesta.getVoto() > 5) {
-            return ResponseEntity.badRequest().body("El voto debe estar entre 1 y 5");
-        }
 
         vPropuestaService.guardarVPropuesta(vPropuesta);
         return ResponseEntity.ok("Voto a propuesta guardado exitosamente");
@@ -67,9 +64,6 @@ public class VPropuestaController {
             return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
         }
 
-        if (vPropuesta.getVoto() < 1 || vPropuesta.getVoto() > 5) {
-            return ResponseEntity.badRequest().body("El voto debe estar entre 1 y 5");
-        }
 
         VotosPropuesta vPropuestaExistente = vPropuestaService.obtenerVPropuestaPorId(id);
         if (vPropuestaExistente == null) {

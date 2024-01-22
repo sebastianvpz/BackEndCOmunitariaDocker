@@ -1,5 +1,8 @@
 package com.gestion.encuesta.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,6 +20,6 @@ public class ParticipacionEvento {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-
+    
     private String rol;
 }

@@ -1,5 +1,11 @@
 package com.gestion.encuesta.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,3 +23,4 @@ public class Evento {
     private String ubicacion;
     
 }
+	
