@@ -109,7 +109,10 @@ import com.gestion.encuesta.service.VPropuestaService;
 
 	    @DeleteMapping("/cancelarVoto/{idPropuesta}/{idUsuario}")
 	    public ResponseEntity<?> cancelarVoto(@PathVariable Long idPropuesta, @PathVariable Long idUsuario) {
+	        System.out.println("Solicitud para cancelar voto recibida. idPropuesta: " + idPropuesta + ", idUsuario: " + idUsuario);
+
 	        vPropuestaService.cancelarVotoPositivo(idPropuesta, idUsuario);
+	        
 	        String successMessage = "Voto a propuesta positivo cancelado exitosamente";
 	        return ResponseEntity.ok().body(Collections.singletonMap("message", successMessage));
 	    }

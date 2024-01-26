@@ -64,18 +64,24 @@ public class VPropuestaService {
     }
 
     public void cancelarVotoPositivo(Long idPropuesta, Long idUsuario) {
+    	System.out.println("Intentando cancelar voto positivo. idPropuesta: " + idPropuesta + ", idUsuario: " + idUsuario);
         Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
         Propuesta propuesta = propuestaService.obtenerPropuestaPorId(idPropuesta);
 
-        if (usuario != null && propuesta != null && usuario.isVotado()) {
+        if (usuario != null && propuesta != null) {
             VotosPropuesta voto = vPropuestaRepository.findByPropuestaAndUsuario(propuesta, usuario);
 
             if (voto != null && voto.isVotoPositivo()) {
+                // Mensajes de depuración
+                System.out.println("Voto encontrado y es positivo. Eliminando...");
+
                 vPropuestaRepository.delete(voto);
 
                 // Actualiza el estado de votado en el usuario
-                usuario.setVotado(false);
                 usuarioRepository.save(usuario);
+            } else {
+                // Mensajes de depuración si el voto no es encontrado o no es positivo
+                System.out.println("Voto no encontrado o no es positivo. No se realiza la cancelación.");
             }
         }
     }
