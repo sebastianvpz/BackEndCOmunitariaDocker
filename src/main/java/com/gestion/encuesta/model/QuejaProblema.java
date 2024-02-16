@@ -17,8 +17,10 @@ public class QuejaProblema {
     @JoinColumn(name = "usuario_id")
     @JsonIgnoreProperties("quejasProblemas")
     private Usuario usuario;
+    private String titulo;
     private String url;
-    private String descripcion;
+    private String ubicacion;
+    private String descripcion;    
     private String fechaReporte;
     private String estado;  
 }
