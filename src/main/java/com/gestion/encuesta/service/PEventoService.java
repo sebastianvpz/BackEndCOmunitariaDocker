@@ -14,6 +14,12 @@ import com.gestion.encuesta.repository.PEventoRepository;
 public class PEventoService {
     @Autowired
     private PEventoRepository pEventoRepository;
+    
+    @Autowired
+    private UsuarioService usuarioService;
+    
+    @Autowired
+    private EventoService eventoService;
 
     public ParticipacionEvento obtenerParticipacionPorUsuarioYEvento(Usuario usuario, Evento evento) {
         // Realizar una consulta personalizada para obtener la participación por usuario y evento
@@ -34,5 +40,20 @@ public class PEventoService {
 
     public void eliminarPEventoPorId(Long id) {
         pEventoRepository.deleteById(id);
+    }
+    public List<ParticipacionEvento> obtenerParticipacionesPorIdDeEvento(Long eventoId) {
+        return pEventoRepository.findByEventoId(eventoId);
+    }
+    
+    public ParticipacionEvento obtenerParticipacionPorUsuarioYEvento(Long usuarioId, Long eventoId) {
+        // Realizar una consulta personalizada para obtener la participación por ID de usuario y ID de evento
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId);
+        Evento evento = eventoService.obtenerEventoPorId(eventoId);
+        
+        if (usuario != null && evento != null) {
+            return pEventoRepository.findByUsuarioAndEvento(usuario, evento);
+        } else {
+            return null;
+        }
     }
 }

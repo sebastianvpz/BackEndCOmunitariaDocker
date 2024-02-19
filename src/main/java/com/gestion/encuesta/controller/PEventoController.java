@@ -86,4 +86,27 @@ public class PEventoController {
     public void eliminarPEvento(@PathVariable Long id) {
         pEventoService.eliminarPEventoPorId(id);
     }
+    
+    @GetMapping("/evento/{eventoId}")
+    public ResponseEntity<?> obtenerParticipacionesPorEventoId(@PathVariable Long eventoId) {
+        List<ParticipacionEvento> participaciones = pEventoService.obtenerParticipacionesPorIdDeEvento(eventoId);
+        return ResponseEntity.ok(participaciones);
+    }
+    
+    @DeleteMapping("/cancelar-participacion/{usuarioId}/{eventoId}")
+    public ResponseEntity<?> cancelarParticipacion(@PathVariable Long usuarioId, @PathVariable Long eventoId) {
+        // Buscar la participación por el ID del usuario y el ID del evento
+        ParticipacionEvento participacionEvento = pEventoService.obtenerParticipacionPorUsuarioYEvento(usuarioId, eventoId);
+        
+        // Verificar si la participación existe
+        if (participacionEvento == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Eliminar la participación
+        pEventoService.eliminarPEventoPorId(participacionEvento.getId());
+        
+        // Devolver una respuesta exitosa
+        return ResponseEntity.ok().body("{\"message\": \"Participación en evento cancelada exitosamente\"}");
+    }
 }
