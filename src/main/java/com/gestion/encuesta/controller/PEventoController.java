@@ -41,21 +41,21 @@ public class PEventoController {
 
     @PostMapping("/guardar")
     public ResponseEntity<?> guardarPEvento(@RequestBody ParticipacionEvento pEvento) {
-        if (pEvento.getEvento() == null) {
-            return ResponseEntity.badRequest().body("El evento no puede ser nulo");
+        // Verificar si ya existe una participación para el usuario y el evento
+        ParticipacionEvento participacionExistente = pEventoService.obtenerParticipacionPorUsuarioYEvento(pEvento.getUsuario(), pEvento.getEvento());
+        if (participacionExistente != null) {
+            // Devolver un mensaje indicando que el usuario ya está participando en este evento
+            return ResponseEntity.badRequest().body("El usuario ya está participando en este evento");
         }
 
-        if (pEvento.getUsuario() == null) {
-            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
-        }
-
+        // Si no hay participación existente, proceder con el guardado
         if (pEvento.getRol() == null || pEvento.getRol().trim().isEmpty()) {
             pEvento.setRol("Asistente");
         }
 
-
         pEventoService.guardarPEvento(pEvento);
-        return ResponseEntity.ok("Participación en evento guardada exitosamente");
+        // Devolver un objeto JSON con un mensaje de éxito
+        return ResponseEntity.ok().body("{\"message\": \"Participación en evento guardada exitosamente\"}");
     }
 
     @PutMapping("/editar/{id}")
