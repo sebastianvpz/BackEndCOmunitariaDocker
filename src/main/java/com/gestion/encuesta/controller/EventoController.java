@@ -25,7 +25,7 @@ import com.gestion.encuesta.service.EventoService;
 public class EventoController {
 	@Autowired
     private EventoService eventoService;
-
+    //comentario de prueba
     @GetMapping("/listar")
     public List<Evento> listarEventos() {
         return eventoService.obtenerTodosLosEventos();
