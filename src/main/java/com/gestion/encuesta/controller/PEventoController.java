@@ -93,6 +93,12 @@ public class PEventoController {
         return ResponseEntity.ok(participaciones);
     }
     
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<?> obtenerParticipacionesPorUsuarioId(@PathVariable Long usuarioId) {
+        List<ParticipacionEvento> participaciones = pEventoService.obtenerParticipacionesPorIdDeUsuario(usuarioId);
+        return ResponseEntity.ok(participaciones);
+    }
+    
     @DeleteMapping("/cancelar-participacion/{usuarioId}/{eventoId}")
     public ResponseEntity<?> cancelarParticipacion(@PathVariable Long usuarioId, @PathVariable Long eventoId) {
         // Buscar la participación por el ID del usuario y el ID del evento

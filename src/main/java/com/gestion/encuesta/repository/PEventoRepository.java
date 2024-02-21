@@ -11,4 +11,5 @@ import com.gestion.encuesta.model.Usuario;
 public interface PEventoRepository extends JpaRepository<ParticipacionEvento, Long>{
 	ParticipacionEvento findByUsuarioAndEvento(Usuario usuario, Evento evento);
 	List<ParticipacionEvento> findByEventoId(Long eventoId);
+	List<ParticipacionEvento> findByUsuarioId(Long usuarioId);
 }

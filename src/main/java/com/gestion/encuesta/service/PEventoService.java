@@ -45,6 +45,11 @@ public class PEventoService {
         return pEventoRepository.findByEventoId(eventoId);
     }
     
+    public List<ParticipacionEvento> obtenerParticipacionesPorIdDeUsuario(Long usuarioId) {
+        // Llamar al repositorio para obtener las participaciones por ID de usuario
+        return pEventoRepository.findByUsuarioId(usuarioId);
+    }
+    
     public ParticipacionEvento obtenerParticipacionPorUsuarioYEvento(Long usuarioId, Long eventoId) {
         // Realizar una consulta personalizada para obtener la participación por ID de usuario y ID de evento
         Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId);
