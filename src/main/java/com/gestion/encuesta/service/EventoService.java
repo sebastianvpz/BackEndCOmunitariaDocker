@@ -30,4 +30,6 @@ public class EventoService {
     public void eliminarEventoPorId(Long id) {
         eventoRepository.deleteById(id);
     }
+
+
 }

@@ -62,7 +62,7 @@ public class EventoController {
         }
         if (evento != null) {
             eventoService.guardarEvento(evento);
-            return ResponseEntity.ok("Evento guardado exitosamente");
+            return ResponseEntity.ok().body("{\"message\": \"Evento guardado exitosamente\"}");
         }else {
             return ResponseEntity.badRequest().build();
         }
@@ -100,7 +100,13 @@ public class EventoController {
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public void eliminarEvento(@PathVariable Long id) {
-        eventoService.eliminarEventoPorId(id);
+    public ResponseEntity<String> eliminarEvento(@PathVariable Long id) {
+        try {
+            eventoService.eliminarEventoPorId(id);
+            return ResponseEntity.ok().body("{\"message\": \"Evento Eliminado exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el evento: " + e.getMessage());
+        }
     }
+
 }
