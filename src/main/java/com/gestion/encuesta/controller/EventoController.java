@@ -94,9 +94,14 @@ public class EventoController {
             return ResponseEntity.badRequest().body("El evento a editar no existe");
         }
 
+        eventoExistente.setTitulo(evento.getTitulo());
+        eventoExistente.setUrl(evento.getUrl());
+        eventoExistente.setDescripcion(evento.getDescripcion());
+        eventoExistente.setFechaHora(evento.getFechaHora());
+        eventoExistente.setUbicacion(evento.getUbicacion());
         evento.setId(id);
-        eventoService.guardarEvento(evento);
-        return ResponseEntity.ok("Evento editado exitosamente");
+        eventoService.guardarEvento(eventoExistente);
+        return ResponseEntity.ok().body("{\"message\": \"Evento Editado exitosamente \"}");
     }
 
     @DeleteMapping("/eliminar/{id}")

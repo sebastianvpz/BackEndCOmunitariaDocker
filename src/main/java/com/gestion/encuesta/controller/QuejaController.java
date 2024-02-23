@@ -65,7 +65,7 @@ public class QuejaController {
 
 
         quejaService.guardarQueja(queja);
-        return ResponseEntity.ok("Queja guardada exitosamente");
+        return ResponseEntity.ok().body("{\"message\": \"Queja Guardada exitosamente \"}");
     }
 
     @PutMapping("/editar/{id}")
