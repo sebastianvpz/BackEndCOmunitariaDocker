@@ -5,6 +5,8 @@ import com.gestion.encuesta.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
@@ -15,7 +17,11 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
         return usuario;
     }
-    
+
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        return usuarioRepository.findAll();
+    }
+
     public Usuario obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id).orElse(null);
     }

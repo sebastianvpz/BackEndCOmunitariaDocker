@@ -29,8 +29,8 @@ public class Usuario {
     private String email;
     private String rol;
     private String password;
-    private boolean votado;
-    
+    private boolean vetado;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonIgnore
     private Collection<Propuesta> itemsPropuesta = new ArrayList<>();
@@ -50,6 +50,11 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonIgnore
     private Collection<QuejaProblema> quejasProblemas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Collection<ReporteQueja> reporteQuejas = new ArrayList<>();
+
 
 }
 

@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/usuario")
 @CrossOrigin("*")
@@ -18,7 +20,11 @@ public class UsuarioController {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-    
+
+    @GetMapping("/listar")
+    public List<Usuario> listarUsuarios() {
+        return service.obtenerTodosLosUsuarios();
+    }
     @PostMapping("/guardar")
     public ResponseEntity<?> registrar(@RequestBody Usuario usuario){
     	 if (usuario.getRol() == null) {
@@ -48,5 +54,31 @@ public class UsuarioController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/vetar/{id}")
+    public ResponseEntity<?> vetarUsuario(@PathVariable Long id) {
+        Usuario usuario = service.obtenerUsuarioPorId(id);
+
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        usuario.setVetado(true);
+        service.guardarUsuario(usuario);
+        return ResponseEntity.ok().body("{\"message\": \"Usuario vetado exitosamente\"}");
+    }
+
+    @PutMapping("/quitar-veto/{id}")
+    public ResponseEntity<?> quitarVetoUsuario(@PathVariable Long id) {
+        Usuario usuario = service.obtenerUsuarioPorId(id);
+
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        usuario.setVetado(false);
+        service.guardarUsuario(usuario);
+        return ResponseEntity.ok().body("{\"message\": \"Veto removido exitosamente\"}");
     }
 }
