@@ -19,11 +19,10 @@ public class Evento {
     private Long id;
 
     private String titulo;
-    private String url;
     private String descripcion;
     private String fechaHora;
     private String ubicacion;
-
+    private String img;
     @JsonIgnore
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParticipacionEvento> participaciones;

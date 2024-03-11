@@ -1,15 +1,13 @@
 package com.gestion.encuesta.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -21,7 +19,12 @@ public class Propuesta {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-    private String url;
+    private String img;
     private String titulo;
+    private String ubicacion;
     private String descripcion;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "propuesta", cascade = CascadeType.ALL)
+    private List<VotosPropuesta> votosPropuestas;
 }

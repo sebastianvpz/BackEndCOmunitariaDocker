@@ -1,23 +1,19 @@
 package com.gestion.encuesta.controller;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 import com.gestion.encuesta.model.Proyecto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.gestion.encuesta.model.Evento;
 import com.gestion.encuesta.service.EventoService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/eventos")
@@ -42,66 +38,76 @@ public class EventoController {
         }
     }
 
-    @PostMapping("/guardar")
-    public ResponseEntity<?> guardarEvento(@RequestBody Evento evento) {
+    @PostMapping(value = "/guardar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> guardarEvento(@RequestParam("img") String imgString64,
+                                           @RequestParam("titulo") String titulo,
+                                           @RequestParam("descripcion") String descripcion,
+                                           @RequestParam("fechaHora") String fechaHora,
+                                           @RequestParam("ubicacion") String ubicacion) {
+        try {
+            // Aquí puedes realizar validaciones adicionales si es necesario
 
-        if (evento.getTitulo() == null || evento.getTitulo().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título del evento no puede estar en blanco");
-        }
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    fechaHora == null || fechaHora.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    ubicacion == null || ubicacion.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos título, fechaHora, descripcion y ubicación no pueden estar vacíos");
+            }
 
-        if (evento.getFechaHora() == null) {
-            return ResponseEntity.badRequest().body("La fecha y hora del evento no pueden ser nulas");
-        }
-
-        if (evento.getDescripcion() == null || evento.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción del evento no puede estar en blanco");
-        }
-
-        if (evento.getUbicacion() == null || evento.getUbicacion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La ubicación del evento no puede estar en blanco");
-        }
-        if (evento != null) {
+            Evento evento = new Evento();
+            evento.setTitulo(titulo);
+            evento.setDescripcion(descripcion);
+            evento.setFechaHora(fechaHora);
+            evento.setUbicacion(ubicacion);
+            evento.setImg(imgString64);
             eventoService.guardarEvento(evento);
+
             return ResponseEntity.ok().body("{\"message\": \"Evento guardado exitosamente\"}");
-        }else {
-            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar el archivo: " + e.getMessage());
         }
+    }
 
+    @PutMapping(value = "/editar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> editarEvento(@PathVariable Long id,
+                                          @RequestParam(value = "img") String imgString64,
+                                          @RequestParam("titulo") String titulo,
+                                          @RequestParam("descripcion") String descripcion,
+                                          @RequestParam("fechaHora") String fechaHora,
+                                          @RequestParam("ubicacion") String ubicacion) {
+        try {
+            Evento eventoExistente = eventoService.obtenerEventoPorId(id);
+            if (eventoExistente == null) {
+                return ResponseEntity.badRequest().body("El evento a editar no existe");
+            }
 
-           }
+            if (titulo == null || titulo.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El título del evento no puede estar en blanco");
+            }
 
-    @PutMapping("/editar/{id}")
-    public ResponseEntity<?> editarEvento(@PathVariable Long id, @RequestBody Evento evento) {
+            if (fechaHora == null) {
+                return ResponseEntity.badRequest().body("La fecha y hora del evento no pueden ser nulas");
+            }
 
-        if (evento.getTitulo() == null || evento.getTitulo().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título del evento no puede estar en blanco");
+            if (descripcion == null || descripcion.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La descripción del evento no puede estar en blanco");
+            }
+
+            if (ubicacion == null || ubicacion.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La ubicación del evento no puede estar en blanco");
+            }
+
+            eventoExistente.setTitulo(titulo);
+            eventoExistente.setDescripcion(descripcion);
+            eventoExistente.setFechaHora(fechaHora);
+            eventoExistente.setUbicacion(ubicacion);
+            eventoExistente.setImg(imgString64);
+
+            eventoService.guardarEvento(eventoExistente);
+            return ResponseEntity.ok().body("{\"message\": \"Evento Editado exitosamente \"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar el archivo: " + e.getMessage());
         }
-
-        if (evento.getFechaHora() == null) {
-            return ResponseEntity.badRequest().body("La fecha y hora del evento no pueden ser nulas");
-        }
-
-        if (evento.getDescripcion() == null || evento.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción del evento no puede estar en blanco");
-        }
-
-        if (evento.getUbicacion() == null || evento.getUbicacion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La ubicación del evento no puede estar en blanco");
-        }
-
-        Evento eventoExistente = eventoService.obtenerEventoPorId(id);
-        if (eventoExistente == null) {
-            return ResponseEntity.badRequest().body("El evento a editar no existe");
-        }
-
-        eventoExistente.setTitulo(evento.getTitulo());
-        eventoExistente.setUrl(evento.getUrl());
-        eventoExistente.setDescripcion(evento.getDescripcion());
-        eventoExistente.setFechaHora(evento.getFechaHora());
-        eventoExistente.setUbicacion(evento.getUbicacion());
-        evento.setId(id);
-        eventoService.guardarEvento(eventoExistente);
-        return ResponseEntity.ok().body("{\"message\": \"Evento Editado exitosamente \"}");
     }
 
     @DeleteMapping("/eliminar/{id}")

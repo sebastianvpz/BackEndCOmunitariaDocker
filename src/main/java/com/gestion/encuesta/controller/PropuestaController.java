@@ -2,17 +2,12 @@ package com.gestion.encuesta.controller;
 
 import java.util.List;
 
+import com.gestion.encuesta.model.Usuario;
+import com.gestion.encuesta.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.gestion.encuesta.model.Propuesta;
 import com.gestion.encuesta.service.PropuestaService;
@@ -24,6 +19,9 @@ public class PropuestaController {
 
     @Autowired
     private PropuestaService propuestaService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping("/listar")
     public List<Propuesta> listarPropuestas() {
@@ -40,60 +38,77 @@ public class PropuestaController {
         }
     }
 
-    @PostMapping("/guardar")
-    public ResponseEntity<?> guardarPropuesta(@RequestBody Propuesta propuesta) {
-        // Validaciones manuales
-        if (propuesta.getUsuario() == null) {
-            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
+    @PostMapping(value = "/guardar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> guardarPropuesta(@RequestParam("img") String imgString64,
+                                              @RequestParam("titulo") String titulo,
+                                              @RequestParam("descripcion") String descripcion,
+                                              @RequestParam("ubicacion") String ubicacion,
+                                              @RequestParam("usuarioId") Long usuarioId) {
+        try {
+            // Aquí puedes realizar validaciones adicionales si es necesario
+
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    ubicacion == null || ubicacion.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos título, descripcion y ubicación no pueden estar vacíos");
+            }
+
+            // Aquí puedes obtener el usuario por su ID
+            Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId);
+            if (usuario == null) {
+                return ResponseEntity.badRequest().body("El usuario con ID " + usuarioId + " no existe");
+            }
+
+            Propuesta propuesta = new Propuesta();
+            propuesta.setTitulo(titulo);
+            propuesta.setDescripcion(descripcion);
+            propuesta.setUbicacion(ubicacion);
+            propuesta.setImg(imgString64);
+            propuesta.setUsuario(usuario); // Asignar el usuario a la propuesta
+            propuestaService.guardarPropuesta(propuesta);
+
+            return ResponseEntity.ok().body("{\"message\": \"Propuesta guardada exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + e.getMessage());
         }
-
-        if (propuesta.getUrl() == null || propuesta.getUrl().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La URL no puede estar en blanco");
-        }
-
-        if (propuesta.getTitulo() == null || propuesta.getTitulo().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título no puede estar en blanco");
-        }
-
-        if (propuesta.getDescripcion() == null || propuesta.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción no puede estar en blanco");
-        }
-
-        // Otras validaciones según sea necesario
-
-        propuestaService.guardarPropuesta(propuesta);
-        return ResponseEntity.ok("Propuesta guardada exitosamente");
     }
 
-    @PutMapping("/editar/{id}")
-    public ResponseEntity<?> editarPropuesta(@PathVariable Long id, @RequestBody Propuesta propuesta) {
-        // Validaciones manuales
-        if (propuesta.getUsuario() == null) {
-            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
+    @PutMapping(value = "/editar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> editarPropuesta(@PathVariable Long id,
+                                             @RequestParam("img") String imgString64,
+                                             @RequestParam("titulo") String titulo,
+                                             @RequestParam("descripcion") String descripcion,
+                                             @RequestParam("ubicacion") String ubicacion,
+                                             @RequestParam("usuarioId") Long usuarioId) {
+        try {
+            Propuesta propuestaExistente = propuestaService.obtenerPropuestaPorId(id);
+            if (propuestaExistente == null) {
+                return ResponseEntity.badRequest().body("La propuesta a editar no existe");
+            }
+
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    ubicacion == null || ubicacion.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos título, descripcion y ubicación no pueden estar vacíos");
+            }
+
+            // Aquí puedes obtener el usuario por su ID
+            Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId);
+            if (usuario == null) {
+                return ResponseEntity.badRequest().body("El usuario con ID " + usuarioId + " no existe");
+            }
+
+            propuestaExistente.setTitulo(titulo);
+            propuestaExistente.setDescripcion(descripcion);
+            propuestaExistente.setUbicacion(ubicacion);
+            propuestaExistente.setImg(imgString64);
+            propuestaExistente.setUsuario(usuario); // Asignar el usuario a la propuesta
+            propuestaService.guardarPropuesta(propuestaExistente);
+
+            return ResponseEntity.ok().body("{\"message\": \"Propuesta editada exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + e.getMessage());
         }
-
-        if (propuesta.getUrl() == null || propuesta.getUrl().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La URL no puede estar en blanco");
-        }
-
-        if (propuesta.getTitulo() == null || propuesta.getTitulo().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título no puede estar en blanco");
-        }
-
-        if (propuesta.getDescripcion() == null || propuesta.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción no puede estar en blanco");
-        }
-
-        // Otras validaciones según sea necesario
-
-        Propuesta propuestaExistente = propuestaService.obtenerPropuestaPorId(id);
-        if (propuestaExistente == null) {
-            return ResponseEntity.badRequest().body("La propuesta a editar no existe");
-        }
-
-        propuesta.setId(id);
-        propuestaService.guardarPropuesta(propuesta);
-        return ResponseEntity.ok("Propuesta editada exitosamente");
     }
 
     @DeleteMapping("/eliminar/{id}")
@@ -104,6 +119,6 @@ public class PropuestaController {
         }
 
         propuestaService.eliminarPropuestaPorId(id);
-        return ResponseEntity.ok("Propuesta eliminada exitosamente");
+        return ResponseEntity.ok().body("{\"message\": \"Propuesta eliminada exitosamente\"}");
     }
 }
