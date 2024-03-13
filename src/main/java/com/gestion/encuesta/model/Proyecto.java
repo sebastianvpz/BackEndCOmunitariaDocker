@@ -14,9 +14,11 @@ public class Proyecto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
     private String titulo;
     private String descripcion;
+    private String ubicacion;
     private String estado;
+    @Column(columnDefinition = "LONGTEXT")
+    private String img;
     
 }	

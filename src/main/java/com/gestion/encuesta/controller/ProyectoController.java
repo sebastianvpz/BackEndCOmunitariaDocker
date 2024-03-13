@@ -3,16 +3,9 @@ package com.gestion.encuesta.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.gestion.encuesta.model.Proyecto;
 import com.gestion.encuesta.service.ProyectoService;
@@ -34,55 +27,66 @@ public class ProyectoController {
         return proyectoService.obtenerProyectoPorId(id);
     }
 
-    @PostMapping("/guardar")
-    public ResponseEntity<?> guardarProyecto(@RequestBody Proyecto proyecto) {
-        if (proyecto.getUrl() == null || proyecto.getUrl().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La URL del proyecto no puede estar en blanco");
+    @PostMapping(value = "/guardar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> guardarProyecto(@RequestParam("img") String imgString64,
+                                             @RequestParam("titulo") String titulo,
+                                             @RequestParam("descripcion") String descripcion,
+                                             @RequestParam("ubicacion") String ubicacion,
+                                             @RequestParam("estado") String estado) {
+        try {
+            // Aquí puedes realizar validaciones adicionales si es necesario
+
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    estado == null || estado.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos título, descripción y estado no pueden estar vacíos");
+            }
+
+            Proyecto proyecto = new Proyecto();
+            proyecto.setTitulo(titulo);
+            proyecto.setDescripcion(descripcion);
+            proyecto.setUbicacion(ubicacion);
+            proyecto.setEstado(estado);
+            proyecto.setImg(imgString64);
+            proyectoService.guardarProyecto(proyecto);
+
+            return ResponseEntity.ok().body("{\"message\": \"Proyecto guardado exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + e.getMessage());
         }
-
-        if (proyecto.getTitulo() == null || proyecto.getTitulo().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título del proyecto no puede estar en blanco");
-        }
-
-        if (proyecto.getDescripcion() == null || proyecto.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción del proyecto no puede estar en blanco");
-        }
-
-        if (proyecto.getEstado() == null || proyecto.getEstado().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El estado del proyecto no puede estar en blanco");
-        }
-
-
-        proyectoService.guardarProyecto(proyecto);
-        return ResponseEntity.ok("Proyecto guardado exitosamente");
     }
 
-    @PutMapping("/editar/{id}")
-    public ResponseEntity<?> editarProyecto(@PathVariable Long id, @RequestBody Proyecto proyecto) {
-        if (proyecto.getUrl() == null || proyecto.getUrl().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La URL del proyecto no puede estar en blanco");
-        }
 
-        if (proyecto.getTitulo() == null || proyecto.getTitulo().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El título del proyecto no puede estar en blanco");
-        }
+    @PutMapping(value = "/editar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> editarProyecto(@PathVariable Long id,
+                                            @RequestParam("img") String imgString64,
+                                            @RequestParam("titulo") String titulo,
+                                            @RequestParam("descripcion") String descripcion,
+                                            @RequestParam("ubicacion") String ubicacion,
+                                            @RequestParam("estado") String estado) {
+        try {
+            Proyecto proyectoExistente = proyectoService.obtenerProyectoPorId(id);
+            if (proyectoExistente == null) {
+                return ResponseEntity.badRequest().body("El proyecto a editar no existe");
+            }
 
-        if (proyecto.getDescripcion() == null || proyecto.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción del proyecto no puede estar en blanco");
-        }
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    estado == null || estado.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos Título, descripción y estado no pueden estar vacíos");
+            }
 
-        if (proyecto.getEstado() == null || proyecto.getEstado().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El estado del proyecto no puede estar en blanco");
-        }
+            proyectoExistente.setTitulo(titulo);
+            proyectoExistente.setDescripcion(descripcion);
+            proyectoExistente.setUbicacion(ubicacion);
+            proyectoExistente.setEstado(estado);
+            proyectoExistente.setImg(imgString64);
 
-        Proyecto proyectoExistente = proyectoService.obtenerProyectoPorId(id);
-        if (proyectoExistente == null) {
-            return ResponseEntity.badRequest().body("El proyecto a editar no existe");
+            proyectoService.guardarProyecto(proyectoExistente);
+            return ResponseEntity.ok().body("{\"message\": \"Proyecto editado exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + e.getMessage());
         }
-
-        proyecto.setId(id);
-        proyectoService.guardarProyecto(proyecto);
-        return ResponseEntity.ok("Proyecto editado exitosamente");
     }
 
     @DeleteMapping("/eliminar/{id}")

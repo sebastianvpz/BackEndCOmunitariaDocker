@@ -19,6 +19,7 @@ public class Propuesta {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+    @Column(columnDefinition = "LONGTEXT")
     private String img;
     private String titulo;
     private String ubicacion;

@@ -2,17 +2,12 @@ package com.gestion.encuesta.controller;
 
 import java.util.List;
 
+import com.gestion.encuesta.model.Usuario;
+import com.gestion.encuesta.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.gestion.encuesta.model.QuejaProblema;
 import com.gestion.encuesta.service.QuejaService;
@@ -23,6 +18,9 @@ import com.gestion.encuesta.service.QuejaService;
 public class QuejaController {
     @Autowired
     private QuejaService quejaService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping("/listar")
     public List<QuejaProblema> listarQuejas() {
@@ -40,66 +38,80 @@ public class QuejaController {
 
     }
 
-    @PostMapping("/guardar")
-    public ResponseEntity<?> guardarQueja(@RequestBody QuejaProblema queja) {
-        // Validaciones manuales
-        if (queja.getUsuario() == null) {
-            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
+    @PostMapping(value = "/guardar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> guardarQueja(@RequestParam("img") String imgString64,
+                                          @RequestParam("titulo") String titulo,
+                                          @RequestParam("descripcion") String descripcion,
+                                          @RequestParam("ubicacion") String ubicacion,
+                                          @RequestParam("fechaReporte") String fechaReporte,
+                                          @RequestParam("estado") String estado,
+                                          @RequestParam("usuarioId") Long usuarioId) {
+        try {
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    estado == null || estado.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos título, descripción y estado no pueden estar vacíos");
+            }
+
+            QuejaProblema queja = new QuejaProblema();
+            // Asignar los valores recibidos a los atributos de la queja
+            queja.setTitulo(titulo);
+            queja.setDescripcion(descripcion);
+            queja.setUbicacion(ubicacion);
+            queja.setFechaReporte(fechaReporte);
+            queja.setEstado(estado);
+            queja.setImg(imgString64);
+            // Obtener el usuario por su ID y asignarlo a la queja
+            Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId);
+            queja.setUsuario(usuario);
+
+            quejaService.guardarQueja(queja);
+
+            return ResponseEntity.ok().body("{\"message\": \"Queja guardada exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + e.getMessage());
         }
-
-        if (queja.getUrl() == null || queja.getUrl().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La URL no puede estar en blanco");
-        }
-
-        if (queja.getDescripcion() == null || queja.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción no puede estar en blanco");
-        }
-
-        if (queja.getFechaReporte() == null || queja.getFechaReporte().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La fecha de reporte no puede estar en blanco");
-        }
-
-        if (queja.getEstado() == null || queja.getEstado().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El estado no puede estar en blanco");
-        }
-
-
-        quejaService.guardarQueja(queja);
-        return ResponseEntity.ok().body("{\"message\": \"Queja Guardada exitosamente \"}");
     }
 
-    @PutMapping("/editar/{id}")
-    public ResponseEntity<?> editarQueja(@PathVariable Long id, @RequestBody QuejaProblema queja) {
-        if (queja.getUsuario() == null) {
-            return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
-        }
+    @PutMapping(value = "/editar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> editarQueja(@PathVariable Long id,
+                                         @RequestParam("img") String imgString64,
+                                         @RequestParam("titulo") String titulo,
+                                         @RequestParam("descripcion") String descripcion,
+                                         @RequestParam("ubicacion") String ubicacion,
+                                         @RequestParam("fechaReporte") String fechaReporte,
+                                         @RequestParam("estado") String estado,
+                                         @RequestParam("usuarioId") Long usuarioId) {
+        try {
+            QuejaProblema quejaExistente = quejaService.obtenerQuejaPorId(id);
+            if (quejaExistente == null) {
+                return ResponseEntity.badRequest().body("La queja a editar no existe");
+            }
 
-        if (queja.getUrl() == null || queja.getUrl().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La URL no puede estar en blanco");
-        }
+            if (titulo == null || titulo.trim().isEmpty() ||
+                    descripcion == null || descripcion.trim().isEmpty() ||
+                    estado == null || estado.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Los campos Título, descripción y estado no pueden estar vacíos");
+            }
 
-        if (queja.getDescripcion() == null || queja.getDescripcion().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La descripción no puede estar en blanco");
-        }
+            // Actualizar los atributos de la queja existente con los nuevos valores
+            quejaExistente.setTitulo(titulo);
+            quejaExistente.setDescripcion(descripcion);
+            quejaExistente.setUbicacion(ubicacion);
+            quejaExistente.setFechaReporte(fechaReporte);
+            quejaExistente.setEstado(estado);
+            quejaExistente.setImg(imgString64);
+            // Obtener el usuario por su ID y asignarlo a la queja
+            Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId);
+            quejaExistente.setUsuario(usuario);
 
-        if (queja.getFechaReporte() == null || queja.getFechaReporte().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("La fecha de reporte no puede estar en blanco");
-        }
+            quejaService.guardarQueja(quejaExistente);
 
-        if (queja.getEstado() == null || queja.getEstado().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("El estado no puede estar en blanco");
+            return ResponseEntity.ok().body("{\"message\": \"Queja editada exitosamente\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al procesar la solicitud: " + e.getMessage());
         }
-
-        QuejaProblema quejaExistente = quejaService.obtenerQuejaPorId(id);
-        if (quejaExistente == null) {
-            return ResponseEntity.badRequest().body("La queja a editar no existe");
-        }
-
-        queja.setId(id);
-        quejaService.guardarQueja(queja);
-        return ResponseEntity.ok("Queja editada exitosamente");
     }
-
 
     @DeleteMapping("/eliminar/{id}")
     public void eliminarQueja(@PathVariable Long id) {

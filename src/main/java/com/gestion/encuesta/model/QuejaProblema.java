@@ -21,11 +21,12 @@ public class QuejaProblema {
     @JsonIgnoreProperties("quejasProblemas")
     private Usuario usuario;
     private String titulo;
-    private String url;
     private String ubicacion;
     private String descripcion;    
     private String fechaReporte;
     private String estado;
+    @Column(columnDefinition = "LONGTEXT")
+    private String img;
 
     @JsonIgnore
     @OneToMany(mappedBy = "quejaProblema", cascade = CascadeType.ALL)
