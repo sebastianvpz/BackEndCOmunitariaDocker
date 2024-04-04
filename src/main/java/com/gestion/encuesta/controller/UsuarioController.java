@@ -1,9 +1,10 @@
 package com.gestion.encuesta.controller;
 
+import com.gestion.encuesta.model.Rol;
 import com.gestion.encuesta.model.Usuario;
+import com.gestion.encuesta.service.RolService;
 import com.gestion.encuesta.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService service;
+    @Autowired
+    private RolService rolService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -27,8 +30,10 @@ public class UsuarioController {
     }
     @PostMapping("/guardar")
     public ResponseEntity<?> registrar(@RequestBody Usuario usuario){
-    	 if (usuario.getRol() == null) {
-             usuario.setRol("USER");
+        Long idrol = 2L;
+        Rol rol = rolService.getRolById(idrol).orElseThrow();
+        if (usuario.getRol() == null) {
+             usuario.setRol(rol);
          }
     	String username = usuario.getUsername();
         String nombre = usuario.getNombre();
