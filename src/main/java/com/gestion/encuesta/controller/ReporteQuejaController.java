@@ -1,7 +1,9 @@
 package com.gestion.encuesta.controller;
 
+import com.gestion.encuesta.dto.ReporteQuejaDTO;
 import com.gestion.encuesta.model.QuejaProblema;
 import com.gestion.encuesta.model.ReporteQueja;
+import com.gestion.encuesta.model.TipoReporte;
 import com.gestion.encuesta.model.Usuario;
 import com.gestion.encuesta.service.QuejaService;
 import com.gestion.encuesta.service.ReporteQuejaService;
@@ -44,19 +46,31 @@ public class ReporteQuejaController {
     }
 
     @PostMapping("/crear")
-    public ResponseEntity<?> crearReporte(@RequestBody ReporteQueja reporte) {
+    public ResponseEntity<?> crearReporte(@RequestBody ReporteQuejaDTO reporte) {
+
+
         if (reporte.getMensaje() == null || reporte.getMensaje().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El mensaje del reporte no puede estar en blanco");
         }
 
-        if(reporte.getUsuario() == null) {
+        if(reporte.getUsuarioId() == null) {
             return ResponseEntity.badRequest().body("El usuario no puede ser nulo");
         }
 
-        if(reporte.getQuejaProblema()== null) {
+        if(reporte.getQuejaId()== null) {
             return ResponseEntity.badRequest().body("La queja no puede ser nulo");
         }
-        reporteQuejaService.guardarReporte(reporte);
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(reporte.getUsuarioId());
+        QuejaProblema quejaProblema = quejaProblemaService.obtenerQuejaPorId(reporte.getQuejaId());
+
+        ReporteQueja reporteQueja = new ReporteQueja();
+        reporteQueja.setMensaje(reporte.getMensaje());
+        reporteQueja.setFechaReporte(reporte.getFechaReporte());
+        reporteQueja.setUsuario(usuario);
+        reporteQueja.setQuejaProblema(quejaProblema);
+
+
+        reporteQuejaService.guardarReporte(reporteQueja);
         return ResponseEntity.ok().body("{\"message\": \"Reporte creado exitosamente\"}");
     }
 

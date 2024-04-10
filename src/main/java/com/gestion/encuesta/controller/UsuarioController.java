@@ -1,5 +1,6 @@
 package com.gestion.encuesta.controller;
 
+import com.gestion.encuesta.model.CambioContrasenaRequest;
 import com.gestion.encuesta.model.Rol;
 import com.gestion.encuesta.model.Usuario;
 import com.gestion.encuesta.service.RolService;
@@ -85,5 +86,54 @@ public class UsuarioController {
         usuario.setVetado(false);
         service.guardarUsuario(usuario);
         return ResponseEntity.ok().body("{\"message\": \"Veto removido exitosamente\"}");
+    }
+
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+        Usuario usuarioExistente = service.obtenerUsuarioPorId(id);
+
+        if (usuarioExistente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Actualizar los campos modificables
+        usuarioExistente.setNombre(usuario.getNombre());
+        usuarioExistente.setApellido(usuario.getApellido());
+        usuarioExistente.setEmail(usuario.getEmail());
+        usuarioExistente.setUsername(usuario.getUsername());
+
+        Usuario usuarioModificado = service.guardarUsuario(usuarioExistente);
+
+        if (usuarioModificado != null) {
+            return ResponseEntity.ok(usuarioModificado);
+        } else {
+            return ResponseEntity.badRequest().body("No se pudo modificar el usuario. Verificar campos.");
+        }
+    }
+
+    @PutMapping("/cambiar-contraseña/{id}")
+    public ResponseEntity<?> cambiarContraseña(@PathVariable Long id, @RequestBody CambioContrasenaRequest cambioContraseñaRequest) {
+        Usuario usuario = service.obtenerUsuarioPorId(id);
+
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Verificar que la contraseña antigua coincida
+        if (!passwordEncoder.matches(cambioContraseñaRequest.getContrasenaAntigua(), usuario.getPassword())) {
+            return ResponseEntity.badRequest().body("La contraseña antigua no es correcta.");
+        }
+
+        // Encriptar y actualizar la contraseña
+        String nuevaContraseñaEncriptada = passwordEncoder.encode(cambioContraseñaRequest.getNuevaContrasena());
+        usuario.setPassword(nuevaContraseñaEncriptada);
+
+        Usuario usuarioActualizado = service.guardarUsuario(usuario);
+
+        if (usuarioActualizado != null) {
+            return ResponseEntity.ok(usuarioActualizado);
+        } else {
+            return ResponseEntity.badRequest().body("No se pudo cambiar la contraseña. Inténtalo nuevamente.");
+        }
     }
 }
