@@ -22,7 +22,7 @@ public class Evento {
     private String descripcion;
     private String fechaHora;
     private String ubicacion;
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String img;
     @JsonIgnore
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)

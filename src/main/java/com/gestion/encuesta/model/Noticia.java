@@ -1,24 +1,20 @@
 package com.gestion.encuesta.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-public class Proyecto {
+public class Noticia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String titulo;
     private String descripcion;
-    private String ubicacion;
-    private String estado;
+    private String fechaHora;
+
     @Column(columnDefinition = "TEXT")
     private String img;
-    
-}	
+
+}

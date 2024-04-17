@@ -25,7 +25,7 @@ public class QuejaProblema {
     private String descripcion;    
     private String fechaReporte;
     private String estado;
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String img;
 
     @JsonIgnore

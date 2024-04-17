@@ -52,6 +52,13 @@ public class QuejaController {
                     estado == null || estado.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Los campos título, descripción y estado no pueden estar vacíos");
             }
+            System.out.println(titulo);
+            System.out.println(descripcion);
+            System.out.println(ubicacion);
+            System.out.println(fechaReporte);
+            System.out.println(estado);
+            System.out.println(imgString64);
+
 
             QuejaProblema queja = new QuejaProblema();
             // Asignar los valores recibidos a los atributos de la queja
